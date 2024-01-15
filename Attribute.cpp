@@ -51,6 +51,7 @@ void Attribute<T>::Set(std::vector<T>& input) {
 
 template<>
 void Attribute<int>::SetAttribPointer(unsigned int slot) {
+	// 告诉OpenGL如何解析顶点数据
 	glVertexAttribIPointer(slot, 1, GL_INT, 0, (void*)0); // 步长设置为0就由OpenGL来决定步长。要求数据必须要紧密排列
 }
 

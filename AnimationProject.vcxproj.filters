@@ -69,6 +69,9 @@
     <ClInclude Include="GLTFLoder.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Sample.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -116,13 +119,8 @@
     <ClCompile Include="GLTFLoader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="static.vert">
-      <Filter>资源文件</Filter>
-    </None>
-    <None Include="lit.frag">
-      <Filter>资源文件</Filter>
-    </None>
+    <ClCompile Include="Sample.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

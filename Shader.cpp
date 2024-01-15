@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "Shader.h"
 #include "glad.h"
 #include <fstream>
@@ -43,6 +45,7 @@ unsigned int Shader::CompileVertexShader(const std::string& vertex) {
 		glDeleteShader(v_shader);
 		return 0;
 	}
+	std::cout << "Vertex compilation successed.\n";
 	return v_shader;
 }
 
@@ -62,6 +65,7 @@ unsigned int Shader::CompileFragmentShader(const std::string& fragment) {
 		glDeleteShader(f_shader);
 		return 0;
 	}
+	std::cout << "Fragment compilation successed.\n";
 	return f_shader;
 }
 
@@ -83,6 +87,7 @@ bool Shader::LinkShaders(unsigned int vertex, unsigned int fragment) {
 	// 连接成功后原来的shader就不需要了
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
+	std::cout << "Shader Link successed.\n";
 	return true;
 }
 
@@ -100,8 +105,9 @@ void Shader::PopulateAttributes() {
 		memset(name, 0, sizeof(char) * 128); // 清空数组
 		glGetActiveAttrib(mHandle, (GLuint)i, 128, &length, &size, &type, name);
 		int attrib = glGetAttribLocation(mHandle, name);
-		if (attrib > 0) {
+		if (attrib >= 0) {
 			mAttributes[name] = attrib;
+			std::cout << "att name: " << name << ".\n";
 		}
 	}
 
@@ -119,12 +125,12 @@ void Shader::PopulateUniforms() {
 
 	glUseProgram(mHandle);
 	glGetProgramiv(mHandle, GL_ACTIVE_UNIFORMS, &count);
-
+	
 	for (int i = 0; i < count; i++) {
 		memset(name, 0, sizeof(char) * 128);
-		glGetActiveAttrib(mHandle, (GLuint)i, 128, &length, &size, &type, name);
+		glGetActiveUniform(mHandle, (GLuint)i, 128, &length, &size, &type, name);
 		int uniform = glGetUniformLocation(mHandle, name);
-		if (uniform > 0) {
+		if (uniform >= 0) {
 			// 判断是不是数组，如果是数组，名字中会有中括号
 			std::string uniformName = name;
 			std::size_t found = uniformName.find('[');
@@ -143,6 +149,7 @@ void Shader::PopulateUniforms() {
 				}
 			}
 			mUniforms[uniformName] = uniform;
+			std::cout << "uniformName: " << uniformName << ", value: " << uniform << ".\n";
 		}
 	}
 

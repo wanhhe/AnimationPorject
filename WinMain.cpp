@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <iostream>
 #include "Application.h"
+#include "Sample.h"
 
 // 函数声明
 int WINAPI WinMain(HINSTANCE, HINSTANCE, PSTR, int);  // 创建窗口
@@ -39,7 +40,7 @@ GLuint gVertexArrayObject = 0;
 
 // 创建窗口
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
-    gApplication = new Application();
+    gApplication = new Sample();
 
 	// 创建窗口
 	WNDCLASSEX wndclass;

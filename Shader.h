@@ -35,13 +35,5 @@ private:
 	void PopulateUniforms();
 };
 
-Shader::Shader()
-{
-}
-
-Shader::~Shader()
-{
-}
-
 #endif // !_H_SHADER_
 
