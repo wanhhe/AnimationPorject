@@ -72,6 +72,18 @@
     <ClInclude Include="Sample.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Interpolation.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Frame.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Track.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformTrack.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -120,6 +132,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Sample.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Track.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformTrack.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
