@@ -20,7 +20,7 @@ public:
 	Clip();
 
 	unsigned int GetIdAtIndex(unsigned int index);
-	void setIdAtIndex(unsigned int index, unsigned int id);
+	void SetIdAtIndex(unsigned int index, unsigned int id);
 	unsigned int Size();
 	float Sample(Pose& outPose, float time); // 对Clip采样并将结果赋给一个Pose
 	TransformTrack& operator[](unsigned int joint); // 根据骨骼id获得

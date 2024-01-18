@@ -198,7 +198,7 @@ unsigned int Shader::GetHandle() {
 	return mHandle;
 }
 
-unsigned int Shader::GetAttributes(const std::string name) {
+unsigned int Shader::GetAttribute(const std::string name) {
 	std::map<std::string, unsigned int>::iterator it = mAttributes.find(name);
 	if (it == mAttributes.end()) {
 		std::cout << "Retrieving bad attribute index: " << name << "\n";
@@ -207,7 +207,7 @@ unsigned int Shader::GetAttributes(const std::string name) {
 	return it->second; // 键值对中第一个参数为first，第二个为second
 }
 
-unsigned int Shader::GetUniforms(const std::string name) {
+unsigned int Shader::GetUniform(const std::string name) {
 	std::map<std::string, unsigned int>::iterator it = mUniforms.find(name);
 	if (it == mUniforms.end()) {
 		std::cout << "Retrieving bad uniform index: " << name << "\n";

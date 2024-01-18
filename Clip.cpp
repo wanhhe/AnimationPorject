@@ -83,7 +83,7 @@ unsigned int Clip::GetIdAtIndex(unsigned int index) {
 	return mTracks[index].GetId();
 }
 
-void Clip::setIdAtIndex(unsigned int index, unsigned int id) {
+void Clip::SetIdAtIndex(unsigned int index, unsigned int id) {
 	mTracks[index].SetId(id);
 }
 

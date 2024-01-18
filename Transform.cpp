@@ -40,6 +40,16 @@ Transform mix(const Transform& a, const Transform& b, float t) {
 	);
 }
 
+bool operator==(const Transform& a, const Transform& b) {
+	return a.position == b.position &&
+		a.rotation == b.rotation &&
+		a.scale == b.scale;
+}
+
+bool operator!=(const Transform& a, const Transform& b) {
+	return !(a == b);
+}
+
 mat4 transformToMat4(const Transform& t) {
 	// 先转换坐标系？
 	vec3 x = t.rotation * vec3(1, 0, 0);

@@ -1,4 +1,4 @@
-#include "GLTFLoder.h"
+#include "GLTFLoader.h"
 #include <iostream>
 #include "Transform.h"
 
@@ -72,7 +72,7 @@ namespace GLTFHelpers {
 		// 读取每帧的数据
 		for (unsigned int i = 0; i < numFrames; i++) {
 			int baseIndex = i * numberOfPerFrame;
-			Frame& frame = inOutTrack[i];
+			Frame<N>& frame = inOutTrack[i];
 			int offset = 0;
 
 			frame.mTime = timelineFloats[i];
@@ -130,7 +130,7 @@ Pose LoadRestPose(cgltf_data* data) {
 	for (unsigned int i = 0; i < boneCount; i++) {
 		cgltf_node* node = &(data->nodes[i]);
 
-		// 设置变换
+		// 设置骨骼的变换
 		Transform transform = GLTFHelpers::GetLocalTransform(data->nodes[i]);
 		result.SetLocalTransform(i, transform);
 
@@ -170,7 +170,6 @@ std::vector<Clip> LoadAnimationClips(cgltf_data* data) {
 	for (unsigned int i = 0; i < numClips; i++) {
 		// 为每个片段设置名称
 		result[i].SetName(data->animations[i].name);
-
 		unsigned int numChannels = (unsigned int)data->animations[i].channels_count;
 		for (unsigned int j = 0; j < numChannels; j++) { // 通道定义了动画的目标节点和属性（如平移、旋转或缩放)
 			cgltf_animation_channel& channel = data->animations[i].channels[j];

@@ -14,8 +14,8 @@ public:
 
 	void Bind(); // 使用Shader前需要绑定
 	void UnBind(); // 不再需要使用后解绑
-	unsigned int GetAttributes(const std::string name);
-	unsigned int GetUniforms(const std::string name);
+	unsigned int GetAttribute(const std::string name);
+	unsigned int GetUniform(const std::string name);
 	unsigned int GetHandle(); // 返回OpenGL句柄
 
 private:

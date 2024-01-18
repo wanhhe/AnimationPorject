@@ -153,17 +153,17 @@ float Track<T, N>::AdjustTimeToFitTrack(float time, bool looping) {
 
 	float startTime = mFrames[0].mTime;
 	float endTime = mFrames[size - 1].mTime;
-	float duration = startTime - endTime;
+	float duration = endTime - startTime;
 	if (duration <= 0.0f) return 0.0f; // 时间间隔不能小于0
 
 	if (looping) {
 		time = fmodf(time - startTime, duration);
 		if (time < 0.0f) time += duration;
-		time = time + duration;
+		time = time + startTime;
 	}
 	else {
-		if (time <= mFrames[0].mTime) return startTime;
-		if (time >= mFrames[size - 1].mTime) return endTime;
+		if (time <= mFrames[0].mTime) time = startTime;
+		if (time >= mFrames[size - 1].mTime) time = endTime;
 	}
 
 	// unreachable
@@ -201,14 +201,14 @@ T Track<T, N>::SampleLinear(float time, bool looping) {
 	int thisFrame = FrameIndex(time, looping);
 	if (thisFrame < 0 || thisFrame >= mFrames.size() - 1) return T(); // 非法索引
 	int nextFrame = thisFrame + 1;
-	float trackTime = AdjustTimeToFitTrack(time); // 修正时间
+	float trackTime = AdjustTimeToFitTrack(time, looping); // 修正时间
 	float thisTime = mFrames[thisFrame].mTime;
 	float frameDelta = mFrames[nextFrame].mTime - thisTime; // 两帧之间的时间差
 	if (frameDelta <= 0.0f) return T();
 
 	float t = (trackTime - thisTime) / frameDelta; // 插值的权重
-	T start = Cast(&mFrames[thisFrame].mValue);
-	T end = Cast(&mFrames[nextFrame].mValue);
+	T start = Cast(&mFrames[thisFrame].mValue[0]);
+	T end = Cast(&mFrames[nextFrame].mValue[0]);
 	
 	return TrackHelpers::Interpolate(start, end, t);
 }
@@ -218,19 +218,19 @@ T Track<T, N>::SampleCubic(float time, bool looping) {
 	int thisFrame = FrameIndex(time, looping);
 	if (thisFrame < 0 || thisFrame >= mFrames.size() - 1) return T(); // 非法索引
 	int nextFrame = thisFrame + 1;
-	float trackTime = AdjustTimeToFitTrack(time); // 修正时间
+	float trackTime = AdjustTimeToFitTrack(time, looping); // 修正时间
 	float thisTime = mFrames[thisFrame].mTime;
 	float frameDelta = mFrames[nextFrame].mTime - thisTime; // 两帧之间的时间差
 	if (frameDelta <= 0.0f) return T();
 
 	float t = (trackTime - thisTime) / frameDelta; // 插值的权重
 
-	T point1 = Cast(&mFrames[thisFrame].mValue);
+	T point1 = Cast(&mFrames[thisFrame].mValue[0]);
 	T slope1;
 	memcpy(&slope1, mFrames[thisFrame].mOut, N * sizeof(float));
 	slope1 = slope1 * frameDelta; // 要缩放 ?
 
-	T point2 = Cast(&mFrames[nextFrame].mValue);
+	T point2 = Cast(&mFrames[nextFrame].mValue[0]);
 	T slope2;
 	memcpy(&slope2, mFrames[nextFrame].mIn, N * sizeof(float));
 	slope2 = slope2 * frameDelta;
