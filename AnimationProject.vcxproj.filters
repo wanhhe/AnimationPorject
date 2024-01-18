@@ -84,6 +84,12 @@
     <ClInclude Include="TransformTrack.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Pose.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Clip.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -138,6 +144,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TransformTrack.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Pose.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Clip.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
