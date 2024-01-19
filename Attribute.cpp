@@ -88,6 +88,7 @@ void Attribute<quat>::SetAttribPointer(unsigned int slot) {
 template<typename T>
 void Attribute<T>::BindTo(unsigned int slot) {
 	glBindBuffer(GL_ARRAY_BUFFER, mHandle); // 需要设置mHandle的VAO，则要先绑定
+	// 配置指定位置的VAO
 	glEnableVertexAttribArray(slot); // 开启该位置的VAO
 	SetAttribPointer(slot);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

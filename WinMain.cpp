@@ -162,7 +162,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 		// 事件处理完后计算时间差来进行画面更新
 		DWORD thisTick = GetTickCount();
-		float deltaTime = float(thisTick - lastTick) * 0.001f;
+		float deltaTime = float(thisTick - lastTick) * 0.001f; // 转化成秒
 		lastTick = thisTick;
 		if (gApplication != 0) {
 			gApplication->Update(deltaTime);

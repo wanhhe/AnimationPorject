@@ -46,6 +46,12 @@
     <Filter Include="源文件\Animation">
       <UniqueIdentifier>{7c77d0a4-6e76-4805-9fbc-899d37143bd2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Rendering">
+      <UniqueIdentifier>{b1e07063-e872-4da3-aaaf-a71f6d2c992d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Rendering">
+      <UniqueIdentifier>{4eaccd79-0087-4996-a57a-e44071f546c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sample.h">
@@ -126,6 +132,12 @@
     <ClInclude Include="khrplatform.h">
       <Filter>头文件\Window</Filter>
     </ClInclude>
+    <ClInclude Include="Skeleton.h">
+      <Filter>头文件\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>头文件\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp">
@@ -191,12 +203,21 @@
     <ClCompile Include="TransformTrack.cpp">
       <Filter>源文件\Animation</Filter>
     </ClCompile>
+    <ClCompile Include="Skeleton.cpp">
+      <Filter>源文件\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>源文件\Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\lit.frag">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\static.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="skinned.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

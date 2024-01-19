@@ -87,6 +87,77 @@ namespace GLTFHelpers {
 			}
 		}
 	}
+
+	// 构建Mesh
+	void MeshFromAttribute(Mesh& outMesh, cgltf_attribute& attribute, cgltf_skin* skin, cgltf_node* nodes, unsigned int nodeCount) {
+		// 该attribute的类型(pos, norm, uv, weight, influence)
+		cgltf_attribute_type attribType = attribute.type;
+		// attribute的访问器
+		cgltf_accessor& accessor = *attribute.data;
+
+		unsigned int componentCount = 0; // 分量是几个
+		if (accessor.type == cgltf_type_vec2) {
+			componentCount = 2;
+		}
+		else if (accessor.type == cgltf_type_vec3) {
+			componentCount = 3;
+		}
+		else if (accessor.type == cgltf_type_vec4) {
+			componentCount = 4;
+		}
+		std::vector<float> values; // 用来读取值
+		GetScalarValues(values, componentCount, accessor);
+		unsigned int accessorCount = (unsigned int)accessor.count; // 数据元素个数
+
+		std::vector<vec3>& positions = outMesh.GetPosition();
+		std::vector<vec3>& normals = outMesh.GetNormal();
+		std::vector<vec2>& texCoords = outMesh.GetTexCoord();
+		std::vector<ivec4>& influences = outMesh.GetInfluences();
+		std::vector<vec4>& weights = outMesh.GetWeights();
+
+		for (unsigned int i = 0; i < accessorCount; i++) {
+			int index = i * componentCount;
+			switch (attribType) {
+			case cgltf_attribute_type_position:
+				positions.push_back(vec3(values[index], values[index + 1], values[index + 2]));
+				break;
+			// 当前顶点的uv
+			case cgltf_attribute_type_texcoord:
+				texCoords.push_back(vec2(values[index], values[index + 1]));
+				break;
+			// 影响当前顶点的权重
+			case cgltf_attribute_type_weights:
+				weights.push_back(vec4(values[index], values[index + 1], values[index + 2], values[index + 3]));
+				break;
+			// 当前顶点的法线
+			case cgltf_attribute_type_normal:
+			{
+				vec3 normal = vec3(values[index + 0], values[index + 1], values[index + 2]);
+				if (lenSq(normal) < 0.000001f) {
+					normal = vec3(0, 1, 0);
+				}
+				normals.push_back(normalized(normal));
+			}
+			break;
+			// 影响当前顶点的骨骼的索引
+			case cgltf_attribute_type_joints:
+			{
+				// values是顶点的关节索引
+				ivec4 joints((int)(values[index] + 0.5f), (int)(values[index + 1] + 0.5f), (int)(values[index + 2] + 0.5f), (int)(values[index + 3] + 0.5f));
+				// 将关节相对于皮肤的索引转换为节点的索引。为了计算关节矩阵，需要知道关节在节点树中的位置和方向，而不是在骨架中的顺序
+				joints.x = std::max(0, GetNodeIndex(skin->joints[joints.x], nodes, nodeCount));
+				joints.y = std::max(0, GetNodeIndex(skin->joints[joints.y], nodes, nodeCount));
+				joints.z = std::max(0, GetNodeIndex(skin->joints[joints.z], nodes, nodeCount));
+				joints.w = std::max(0, GetNodeIndex(skin->joints[joints.w], nodes, nodeCount));
+
+				influences.push_back(joints);
+			}
+			break;
+			default:
+				break;
+			}
+		}
+	}
 }
 
 cgltf_data* LoadGLTFFile(const char* path) {
@@ -194,4 +265,96 @@ std::vector<Clip> LoadAnimationClips(cgltf_data* data) {
 	}
 
 	return result;
+}
+
+Pose LoadBindPose(cgltf_data* data) {
+	// 先获得restPose作为默认值，避免该文件未设置bindPose而导致错误
+	Pose restPose = LoadRestPose(data);
+	unsigned int numBones = restPose.Size();
+	std::vector<Transform> worldBindPose(numBones);
+	for (unsigned int i = 0; i < numBones; i++) {
+		worldBindPose[i] = restPose.GetGlobalTransform(i); // 设置每个关节的默认值
+	}
+
+	unsigned int numSkins = data->skins_count;
+	for (unsigned int i = 0; i < numSkins; i++) { // 获得每个皮肤的逆绑定矩阵(全局矩阵)
+		cgltf_skin* skin = &(data->skins[i]);
+		std::vector<float> invBindAccessor;
+		GLTFHelpers::GetScalarValues(invBindAccessor, 16, *skin->inverse_bind_matrices); // 一个元素由一个4*4的矩阵构成
+	
+		// 获得该蒙皮上每个关节的逆绑定矩阵
+		unsigned int numJoints = skin->joints_count;
+		for (unsigned int j = 0; j < numJoints; j++) {
+			// 获得该关节的 inverse bind matrix
+			float* matrix = &invBindAccessor[j * 16];
+			mat4 invBindMatrix = mat4(matrix);
+			// 获得绑定矩阵
+			mat4 bindMatrix = inverse(invBindMatrix);
+			Transform bindTransform = mat4ToTransform(bindMatrix);
+			// 根据结点设置绑定变换
+			cgltf_node* jointNode = skin->joints[j];
+			int jointIndex = GLTFHelpers::GetNodeIndex(jointNode, data->nodes, numBones);
+			worldBindPose[jointIndex] = bindTransform;
+		}
+	}
+
+	// 将世界变换转为相对于父节点的局部变换
+	Pose bindPose = restPose;
+	for (unsigned int i = 0; i < numBones; i++) {
+		Transform current = worldBindPose[i];
+		int p = bindPose.GetParent(i);
+		if (p >= 0) {
+			Transform parent = worldBindPose[p];
+			current = combine(inverse(parent), current); // 父节点的逆矩阵乘该结点的变换就可以取消父节点的变换
+		}
+		bindPose.SetLocalTransform(i, current);
+	}
+
+	return bindPose;
+}
+
+Skeleton LoadSkeleton(cgltf_data* data) {
+	return Skeleton(LoadRestPose(data), LoadBindPose(data), LoadJointNames(data));
+}
+
+// 该函数仅支持只有一个模型的情况
+std::vector<Mesh> LoadMeshes(cgltf_data* data) {
+	std::vector<Mesh> result;
+	cgltf_node* nodes = data->nodes;
+	unsigned int nodeCount = (unsigned int)data->nodes_count;
+
+	for (unsigned int i = 0; i < nodeCount; i++) {
+		cgltf_node* node = &node[i];
+		// 如果该节点没有mesh或skin就先跳过
+		if (node->mesh == 0 || node->skin == 0) {
+			continue;
+		}
+
+		// gltf中一个mesh对应一个primitive。
+		unsigned int numPrims = (unsigned int)node->mesh->primitives_count;
+		for (unsigned int j = 0; j < numPrims; j++) {
+			result.push_back(Mesh());
+			Mesh& mesh = result[result.size() - 1];
+
+			cgltf_primitive* primitive = &node->mesh->primitives[j];
+
+			unsigned int numAttributes = (unsigned int)primitive->attributes_count;
+			for (unsigned int k = 0; k < numAttributes; k++) {
+				cgltf_attribute* attribute = &primitive->attributes[k];
+				GLTFHelpers::MeshFromAttribute(mesh, *attribute, node->skin, nodes, nodeCount);
+			}
+
+			if (primitive->indices != 0) {
+				// 如果有索引下标，还要填充IndexBuffer
+				unsigned int indexCount = primitive->indices->count;
+				std::vector<unsigned int>& indices = mesh.GetIndices();
+				indices.resize(indexCount);
+
+				for (unsigned int k = 0; k < indexCount; k++) {
+					indices[k] = (unsigned int)cgltf_accessor_read_index(primitive->indices, k);
+				}
+			}
+			mesh.UpdateOpenGLBuffers();
+		}
+	}
 }
