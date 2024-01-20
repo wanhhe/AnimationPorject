@@ -160,9 +160,9 @@ void Mesh::CPUSkin(Skeleton& skeleton, Pose& pose) {
 		vec4& weight = mWeights[i];
 
 		mat4 m0 = (mPosePalette[joint.x] * invPosePalette[joint.x]) * weight.x;
-		mat4 m1 = (mPosePalette[joint.x] * invPosePalette[joint.x]) * weight.x;
-		mat4 m2 = (mPosePalette[joint.x] * invPosePalette[joint.x]) * weight.x;
-		mat4 m3 = (mPosePalette[joint.x] * invPosePalette[joint.x]) * weight.x;
+		mat4 m1 = (mPosePalette[joint.y] * invPosePalette[joint.y]) * weight.y;
+		mat4 m2 = (mPosePalette[joint.z] * invPosePalette[joint.z]) * weight.z;
+		mat4 m3 = (mPosePalette[joint.w] * invPosePalette[joint.w]) * weight.w;
 
 		mat4 skin = m0 + m1 + m2 + m3;
 		mSkinnedPosition[i] = transformPoint(skin, mPosition[i]);
