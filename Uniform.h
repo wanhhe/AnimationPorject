@@ -3,8 +3,8 @@
 
 #include <vector>
 
+ // 该类永远不会实例化
 template<typename T>
-// 该类永远不会实例化
 class Uniform
 {
 private:
@@ -16,7 +16,7 @@ private:
 
 public:
 	static void Set(unsigned int slot, const T& value);
-	static void Set(unsigned int slot, T* inputArray, int length);
+	static void Set(unsigned int slot, T* inputArray, unsigned int length);
 	static void Set(unsigned int slot, std::vector<T>& inputArray);
 };
 

@@ -27,49 +27,48 @@ void Uniform<T>::Set(unsigned int slot, std::vector<T>& inputArray) {
 }
 
 template<>
-void Uniform<mat4>::Set(unsigned int slot, mat4* inputArray, int length) {
+void Uniform<mat4>::Set(unsigned int slot, mat4* inputArray, unsigned int length) {
 	// location 要更改的矩阵个数 是否要转置 开始的指针
 	glUniformMatrix4fv(slot, (GLsizei)length, false, (float*)&inputArray[0]);
 }
 
 template<>
-void Uniform<int>::Set(unsigned int slot, int* inputArray, int length) {
+void Uniform<int>::Set(unsigned int slot, int* inputArray, unsigned int length) {
 	// location 要更改的元素个数 一个具有count个数值的数组指针
 	glUniform1iv(slot, (GLsizei)length, (int*)&inputArray[0]);
 }
 
 template<>
-void Uniform<ivec2>::Set(unsigned int slot, ivec2* inputArray, int length) {
+void Uniform<ivec2>::Set(unsigned int slot, ivec2* inputArray, unsigned int length) {
 	glUniform4iv(slot, (GLsizei)length, (int*)&inputArray[0]);
 }
 
 template<>
-void Uniform<ivec4>::Set(unsigned int slot, ivec4* inputArray, int length) {
+void Uniform<ivec4>::Set(unsigned int slot, ivec4* inputArray, unsigned int length) {
 	glUniform2iv(slot, (GLsizei)length, (int*)&inputArray[0]);
 }
 
 template<>
-void Uniform<float>::Set(unsigned int slot, float* inputArray, int length) {
+void Uniform<float>::Set(unsigned int slot, float* inputArray, unsigned int length) {
 	glUniform1fv(slot, (GLsizei)length, (float*)&inputArray[0]);
 }
 
 template<>
-void Uniform<vec2>::Set(unsigned int slot, vec2* inputArray, int length) {
+void Uniform<vec2>::Set(unsigned int slot, vec2* inputArray, unsigned int length) {
 	glUniform2fv(slot, (GLsizei)length, (float*)&inputArray[0]);
 }
 
 template<>
-void Uniform<vec3>::Set(unsigned int slot, vec3* inputArray, int length) {
+void Uniform<vec3>::Set(unsigned int slot, vec3* inputArray, unsigned int length) {
 	glUniform3fv(slot, (GLsizei)length, (float*)&inputArray[0]);
 }
 
 template<>
-void Uniform<vec4>::Set(unsigned int slot, vec4* inputArray, int length) {
+void Uniform<vec4>::Set(unsigned int slot, vec4* inputArray, unsigned int length) {
 	glUniform4fv(slot, (GLsizei)length, (float*)&inputArray[0]);
 }
 
 template<>
-void Uniform<quat>::Set(unsigned int slot, quat* inputArray, int length) {
+void Uniform<quat>::Set(unsigned int slot, quat* inputArray, unsigned int length) {
 	glUniform4fv(slot, (GLsizei)length, (float*)&inputArray[0]);
 }
-
