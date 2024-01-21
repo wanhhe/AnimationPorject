@@ -1,17 +1,17 @@
 #include "Transform.h"
 #include <cmath>
 
-Transform combine(const Transform& a, const Transform& b) {
-	Transform out;
-	// 从右向左乘，左边的先发挥作用
-	out.scale = a.scale * b.scale;
-	out.rotation = a.rotation * b.rotation;
-
-	out.position = a.rotation * (a.scale * b.position);
-	out.position = a.position + out.position;
-
-	return out;
-}
+//Transform combine(const Transform& a, const Transform& b) {
+//	Transform out;
+//	// 从右向左乘，左边的先发挥作用
+//	out.scale = a.scale * b.scale;
+//	out.rotation = a.rotation * b.rotation;
+//
+//	out.position = a.rotation * (a.scale * b.position);
+//	out.position = a.position + out.position;
+//
+//	return out;
+//}
 
 Transform inverse(const Transform& t) {
 	Transform inv;
@@ -24,6 +24,18 @@ Transform inverse(const Transform& t) {
 	inv.position = inv.rotation * (inv.scale * invTrans);
 
 	return inv;
+}
+
+Transform combine(const Transform& a, const Transform& b) {
+	Transform out;
+
+	out.scale = a.scale * b.scale;
+	out.rotation = b.rotation * a.rotation;
+
+	out.position = a.rotation * (a.scale * b.position);
+	out.position = a.position + out.position;
+
+	return out;
 }
 
 Transform mix(const Transform& a, const Transform& b, float t) {
@@ -53,12 +65,12 @@ bool operator!=(const Transform& a, const Transform& b) {
 mat4 transformToMat4(const Transform& t) {
 	// 先转换坐标系？
 	vec3 x = t.rotation * vec3(1, 0, 0);
-	vec3 y = t.rotation * vec3(0, 1, 1);
+	vec3 y = t.rotation * vec3(0, 1, 0);
 	vec3 z = t.rotation * vec3(0, 0, 1);
 	// 不知道先放缩后旋转是什么结果
-	x = t.scale * x;
-	y = t.scale * y;
-	z = t.scale * z;
+	x = x * t.scale.x; // 缩放对应的轴
+	y = y * t.scale.y;
+	z = z * t.scale.z;
 
 	vec3 p = t.position;
 
@@ -66,7 +78,7 @@ mat4 transformToMat4(const Transform& t) {
 		x.x, x.y, x.z, 0,
 		y.x, y.y, y.z, 0,
 		z.x, z.y, z.z, 0,
-		0, 0, 0, 1
+		p.x, p.y, p.z, 1 // 位移
 	);
 }
 

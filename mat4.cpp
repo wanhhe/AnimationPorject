@@ -213,14 +213,14 @@ mat4 ortho(float l, float r, float b, float t, float n, float f) {
 }
 
 mat4 lookAt(const vec3& position, const vec3& target, const vec3& up) {
-	// Remember, forward is negative z
-	vec3 f = normalized(target - position) * -1.0f;
-	vec3 r = cross(up, f); // Right handed
+	// Remember, forward is negative z。相机朝向Z轴负方向
+	vec3 f = normalized(target - position) * -1.0f; // 所以要乘-1.
+	vec3 r = cross(up, f); // 右手系
 	if (r == vec3(0, 0, 0)) {
 		return mat4(); // Error
 	}
 	normalize(r);
-	vec3 u = normalized(cross(f, r)); // Right handed
+	vec3 u = normalized(cross(f, r)); // 右手系
 
 	vec3 t = vec3(
 		-dot(r, position),

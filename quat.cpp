@@ -148,10 +148,11 @@ quat normalized(const quat& q) {
 	if (lenSq < QUAT_EPSILON) {
 		return quat();
 	}
-
 	float inverse_len = 1.0f / sqrtf(lenSq);
 	return quat(q.x * inverse_len, q.y * inverse_len, q.z * inverse_len, q.w * inverse_len);
 }
+
+
 
 quat conjugate(const quat& q) {
 	return quat(
@@ -256,7 +257,7 @@ quat lookRotation(const vec3& direction, const vec3& up) {
 	// up是世界空间下向上的向量
 	vec3 f = normalized(direction); // Object Forward 相机朝向的方向
 	vec3 u = normalized(up); // Desired Up，世界空间下向上的向量
-	vec3 r = cross(f, u); // Object Right，相机的向右方向。 通过叉乘获得相机的向右方向
+	vec3 r = cross(u, f); // Object Right，相机的向右方向。 通过叉乘获得相机的向右方向
 
 	u = cross(f, r); // Object Up。获得相机空间下向上的方向。感觉按右手系的话应该是cross(r, f)?????
 	// From world forward to object forward

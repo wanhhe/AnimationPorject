@@ -158,6 +158,7 @@ namespace GLTFHelpers {
 			}
 		}
 	}
+
 }
 
 cgltf_data* LoadGLTFFile(const char* path) {
@@ -324,7 +325,7 @@ std::vector<Mesh> LoadMeshes(cgltf_data* data) {
 	unsigned int nodeCount = (unsigned int)data->nodes_count;
 
 	for (unsigned int i = 0; i < nodeCount; i++) {
-		cgltf_node* node = &node[i];
+		cgltf_node* node = &nodes[i];
 		// 如果该节点没有mesh或skin就先跳过
 		if (node->mesh == 0 || node->skin == 0) {
 			continue;
@@ -357,4 +358,6 @@ std::vector<Mesh> LoadMeshes(cgltf_data* data) {
 			mesh.UpdateOpenGLBuffers();
 		}
 	}
+
+	return result;
 }

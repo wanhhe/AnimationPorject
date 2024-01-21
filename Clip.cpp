@@ -17,7 +17,7 @@ float Clip::Sample(Pose& outPose, float time) {
 	for (unsigned int i = 0; i < size; i++) {
 		unsigned int joint = mTracks[i].GetId();
 		// 如果变换的组件没有设置动画，则使用引用的Pose的默认值
-		Transform local = outPose.GetLocalTransform(i);
+		Transform local = outPose.GetLocalTransform(joint);
 		Transform animated = mTracks[i].Sample(local, time, mLooping);
 		outPose.SetLocalTransform(joint, animated);
 	}

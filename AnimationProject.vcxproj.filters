@@ -217,7 +217,7 @@
     <None Include="Shaders\static.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="skinned.vert">
+    <None Include="Shaders\skinned.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
