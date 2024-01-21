@@ -8,14 +8,14 @@ class Shader
 {
 public:
 	Shader();
-	Shader(const std::string vertex, const std::string fragment);
+	Shader(const std::string& vertex, const std::string& fragment);
 	~Shader();
-	void Load(const std::string vertex, const std::string fragment);
+	void Load(const std::string& vertex, const std::string& fragment);
 
 	void Bind(); // 使用Shader前需要绑定
 	void UnBind(); // 不再需要使用后解绑
-	unsigned int GetAttribute(const std::string name);
-	unsigned int GetUniform(const std::string name);
+	unsigned int GetAttribute(const std::string& name);
+	unsigned int GetUniform(const std::string& name);
 	unsigned int GetHandle(); // 返回OpenGL句柄
 
 private:
@@ -36,4 +36,3 @@ private:
 };
 
 #endif // !_H_SHADER_
-

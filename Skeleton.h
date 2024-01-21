@@ -12,7 +12,7 @@ protected:
 	Pose mRestPose;
 	Pose mBindPose;
 	std::vector<mat4> mInvBindPose; // 反向绑定姿势矩阵。用于从模型空间转到蒙皮空间
-	std::vector<std::string> mJointsName; // 关节名称
+	std::vector<std::string> mJointNames; // 关节名称
 
 	void UpdateInverseBindPose();
 
@@ -23,10 +23,9 @@ public:
 	void Set(const Pose& rest, const Pose& bind, const std::vector<std::string>& names);
 	Pose& GetBindPose();
 	Pose& GetRestPose();
-	std::vector<std::string>& GetJointsNames();
-	std::string& GetJointsName(unsigned int index);
-	std::vector<mat4> GetInvBindPose();
+	std::vector<std::string>& GetJointNames();
+	std::string& GetJointName(unsigned int index);
+	std::vector<mat4>& GetInvBindPose();
 };
 
 #endif // !_H_SKELETON_
-

@@ -9,7 +9,7 @@ Skeleton::Skeleton(const Pose& rest, const Pose& bind, const std::vector<std::st
 void Skeleton::Set(const Pose& rest, const Pose& bind, const std::vector<std::string>& names) {
 	mRestPose = rest;
 	mBindPose = bind;
-	mJointsName = names;
+	mJointNames = names;
 	UpdateInverseBindPose();
 }
 
@@ -31,14 +31,14 @@ Pose& Skeleton::GetRestPose() {
 	return mRestPose;
 }
 
-std::vector<std::string>& Skeleton::GetJointsNames() {
-	return mJointsName;
+std::vector<std::string>& Skeleton::GetJointNames() {
+	return mJointNames;
 }
 
-std::string& Skeleton::GetJointsName(unsigned int index) {
-	return mJointsName[index];
+std::string& Skeleton::GetJointName(unsigned int index) {
+	return mJointNames[index];
 }
 
-std::vector<mat4> Skeleton::GetInvBindPose() {
+std::vector<mat4>& Skeleton::GetInvBindPose() {
 	return mInvBindPose;
 }

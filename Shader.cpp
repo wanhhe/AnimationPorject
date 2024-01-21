@@ -10,7 +10,7 @@ Shader::Shader() {
 	mHandle = glCreateProgram();
 }
 
-Shader::Shader(const std::string vertex, const std::string fragment) {
+Shader::Shader(const std::string& vertex, const std::string& fragment) {
 	mHandle = glCreateProgram();
 	Load(vertex, fragment);
 }
@@ -156,7 +156,7 @@ void Shader::PopulateUniforms() {
 	glUseProgram(0);
 }
 
-void Shader::Load(const std::string vertex, const std::string fragment) {
+void Shader::Load(const std::string& vertex, const std::string& fragment) {
 	std::ifstream f(vertex.c_str());
 	bool vertFile = f.good();
 	f.close();
@@ -198,7 +198,7 @@ unsigned int Shader::GetHandle() {
 	return mHandle;
 }
 
-unsigned int Shader::GetAttribute(const std::string name) {
+unsigned int Shader::GetAttribute(const std::string& name) {
 	std::map<std::string, unsigned int>::iterator it = mAttributes.find(name);
 	if (it == mAttributes.end()) {
 		std::cout << "Retrieving bad attribute index: " << name << "\n";
@@ -207,7 +207,7 @@ unsigned int Shader::GetAttribute(const std::string name) {
 	return it->second; // 键值对中第一个参数为first，第二个为second
 }
 
-unsigned int Shader::GetUniform(const std::string name) {
+unsigned int Shader::GetUniform(const std::string& name) {
 	std::map<std::string, unsigned int>::iterator it = mUniforms.find(name);
 	if (it == mUniforms.end()) {
 		std::cout << "Retrieving bad uniform index: " << name << "\n";
