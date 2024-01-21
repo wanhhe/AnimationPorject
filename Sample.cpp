@@ -9,6 +9,8 @@
 
 #include "Uniform.h"
 
+#include "RearrangeBones.h"
+
 //void Sample::Initialize() {
 //	mRotation = 0.0f;
 //	mShader = new Shader("./Shaders/static.vert", "./Shaders/lit.frag");
@@ -81,13 +83,26 @@ void Sample::Initialize() {
 	mClips = LoadAnimationClips(gltf);
 	FreeGLTFFile(gltf);
 
+	// 调整骨骼顺序
+	BoneMap bones = RearrangeSkeleton(mSkeleton);
+	for (unsigned int i = 0; i < (unsigned int)mCPUMeshes.size(); i++) {
+		// 对每个mesh也要调整
+		RearrangeMesh(mCPUMeshes[i], bones);
+	}
+	for (unsigned int i = 0; i < mClips.size(); i++) {
+		// 由于骨骼id变了，TransformTrack中的id也就变了，需要调整
+		RearrangeClip(mClips[i], bones);
+	}
+
 	mGPUMeshes = mCPUMeshes;
 	for (unsigned int i = 0, size = (unsigned int)mGPUMeshes.size(); i < size; ++i) {
 		mGPUMeshes[i].UpdateOpenGLBuffers();
 	}
 
 	mStaticShader = new Shader("Shaders/static.vert", "Shaders/lit.frag");
-	mSkinnedShader = new Shader("Shaders/skinned.vert", "Shaders/lit.frag");
+	//mSkinnedShader = new Shader("Shaders/skinned.vert", "Shaders/lit.frag");
+	mSkinnedShader = new Shader("Shaders/preskinned.vert", "Shaders/lit.frag");
+	//mSkinnedShader = new Shader("Shaders/static.vert", "Shaders/lit.frag");
 	mDiffuseTexture = new Texture("Assets/NRM_base.png");
 
 	mGPUAnimInfo.mAnimatedPose = mSkeleton.GetRestPose();
@@ -96,7 +111,10 @@ void Sample::Initialize() {
 	mCPUAnimInfo.mPosePalette.resize(mSkeleton.GetRestPose().Size());
 	mGPUAnimInfo.mModel.position = vec3(-2, 0, 0);
 	mCPUAnimInfo.mModel.position = vec3(2, 0, 0);
-	mCPUAnimInfo.mModel.scale = vec3(500, 500, 500);
+	mGPUAnimInfo.mModel.scale = vec3(200, 200, 200);
+	mCPUAnimInfo.mModel.scale = vec3(400, 400, 400);
+
+	std::cout << "pose: " << mSkeleton.GetRestPose().Size() << ";\n";
 
 	unsigned int numUIClips = (unsigned int)mClips.size();
 	for (unsigned int i = 0; i < numUIClips; i++) {
@@ -121,16 +139,37 @@ void Sample::Initialize() {
 //	mCurrentPoseVisual->FromPose(mCurrentPose);
 //}
 
+//void Sample::Update(float inDeltaTime) {
+//	mCPUAnimInfo.mPlayback = mClips[mCPUAnimInfo.mClip].Sample(mCPUAnimInfo.mAnimatedPose, mCPUAnimInfo.mPlayback + inDeltaTime);
+//	mGPUAnimInfo.mPlayback = mClips[mGPUAnimInfo.mClip].Sample(mGPUAnimInfo.mAnimatedPose, mGPUAnimInfo.mPlayback + inDeltaTime);
+//
+//	unsigned int size = (unsigned int)mCPUMeshes.size();
+//	for (unsigned int i = 0; i < size; i++) {
+//		mCPUMeshes[i].CPUSkin(mSkeleton, mCPUAnimInfo.mAnimatedPose);
+//	}
+//
+//	mGPUAnimInfo.mAnimatedPose.GetMatrixPalette(mGPUAnimInfo.mPosePalette);
+//}
+
+// 改进
 void Sample::Update(float inDeltaTime) {
 	mCPUAnimInfo.mPlayback = mClips[mCPUAnimInfo.mClip].Sample(mCPUAnimInfo.mAnimatedPose, mCPUAnimInfo.mPlayback + inDeltaTime);
 	mGPUAnimInfo.mPlayback = mClips[mGPUAnimInfo.mClip].Sample(mGPUAnimInfo.mAnimatedPose, mGPUAnimInfo.mPlayback + inDeltaTime);
 
-	unsigned int size = (unsigned int)mCPUMeshes.size();
-	for (unsigned int i = 0; i < size; i++) {
-		mCPUMeshes[i].CPUSkin(mSkeleton, mCPUAnimInfo.mAnimatedPose);
-	}
-
+	mCPUAnimInfo.mAnimatedPose.GetMatrixPalette(mCPUAnimInfo.mPosePalette);
 	mGPUAnimInfo.mAnimatedPose.GetMatrixPalette(mGPUAnimInfo.mPosePalette);
+
+	// 获得动画变换矩阵
+	unsigned int size = (unsigned int)mCPUAnimInfo.mPosePalette.size();;
+	for (unsigned int i = 0; i < size; i++) {
+		mCPUAnimInfo.mPosePalette[i] = mCPUAnimInfo.mPosePalette[i] * mSkeleton.GetInvBindPose()[i];
+		mGPUAnimInfo.mPosePalette[i] = mGPUAnimInfo.mPosePalette[i] * mSkeleton.GetInvBindPose()[i];
+	}
+	
+	size = (unsigned int)mCPUMeshes.size();
+	for (unsigned int i = 0; i < size; i++) {
+		mCPUMeshes[i].CPUSkin(mCPUAnimInfo.mPosePalette);
+	}
 }
 
 //void Sample::Render(float inAspectRatio) {
@@ -177,8 +216,8 @@ void Sample::Update(float inDeltaTime) {
 
 void Sample::Render(float inAspectRatio) {
 	mat4 projection = perspective(60.0f, inAspectRatio, 0.01f, 1000.0f);
-	//mat4 view = lookAt(vec3(0, 5, 7), vec3(0, 3, 0), vec3(0, 1, 0));
-	mat4 view = lookAt(vec3(10, 5, 7), vec3(0, 3, 0), vec3(0, 1, 0));
+	mat4 view = lookAt(vec3(0, 5, 7), vec3(0, 3, 0), vec3(0, 1, 0));
+	//mat4 view = lookAt(vec3(10, 5, 7), vec3(0, 3, 0), vec3(0, 1, 0));
 	mat4 model;
 
 	// CPU 蒙皮
@@ -206,8 +245,10 @@ void Sample::Render(float inAspectRatio) {
 	Uniform<mat4>::Set(mSkinnedShader->GetUniform("projection"), projection);
 	Uniform<vec3>::Set(mSkinnedShader->GetUniform("light"), vec3(1, 1, 1));
 
-	Uniform<mat4>::Set(mSkinnedShader->GetUniform("pose"), mGPUAnimInfo.mPosePalette);
-	Uniform<mat4>::Set(mSkinnedShader->GetUniform("invBindPose"), mSkeleton.GetInvBindPose());
+	//Uniform<mat4>::Set(mSkinnedShader->GetUniform("pose"), mGPUAnimInfo.mPosePalette);
+	//Uniform<mat4>::Set(mSkinnedShader->GetUniform("invBindPose"), mSkeleton.GetInvBindPose());
+	// 改进
+	Uniform<mat4>::Set(mSkinnedShader->GetUniform("animated"), mGPUAnimInfo.mPosePalette);
 
 	mDiffuseTexture->Set(mSkinnedShader->GetUniform("tex0"), 0);
 	for (unsigned int i = 0, size = (unsigned int)mGPUMeshes.size(); i < size; ++i) {
@@ -217,7 +258,6 @@ void Sample::Render(float inAspectRatio) {
 	}
 	mDiffuseTexture->UnSet(0);
 	mSkinnedShader->UnBind();
-
 }
 
 //void Sample::Shutdown() {

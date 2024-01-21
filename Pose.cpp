@@ -60,6 +60,33 @@ Transform Pose::operator[](unsigned int index) {
 	return result;
 }
 
+#if 1
+void Pose::GetMatrixPalette(std::vector<mat4>& out) {
+	int size = (int)Size();
+	if ((int)out.size() != size) {
+		out.resize(size);
+	}
+
+	int i = 0;
+	for (; i < size; i++) {
+		int parent = mParents[i];
+		if (parent > i) { // 如果是无序的，退化成原始版本
+			break;
+		}
+
+		mat4 global = transformToMat4(mJoints[i]); // 获得局部变换
+		if (parent >= 0) {
+			global = out[parent] * global; // 由于是从小到大的，out[parent]已经是被处理过的了
+		}
+		out[i] = global;
+	}
+
+	for (; i < size; ++i) {
+		Transform t = GetGlobalTransform(i);
+		out[i] = transformToMat4(t);
+	}
+}
+#else
 void Pose::GetMatrixPalette(std::vector<mat4>& out) {
 	unsigned int size = mJoints.size();
 	if (out.size() != size) {
@@ -67,10 +94,11 @@ void Pose::GetMatrixPalette(std::vector<mat4>& out) {
 	}
 
 	for (unsigned int i = 0; i < size; i++) {
-		Transform t = GetGlobalTransform(i);
+		Transform t = GetGlobalTransform(i); // 找了大量重复节点，很耗时
 		out[i] = transformToMat4(t);
 	}
 }
+#endif
 
 int Pose::GetParent(unsigned int index) {
 	return mParents[index];

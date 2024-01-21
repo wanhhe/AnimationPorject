@@ -209,3 +209,33 @@ void Mesh::CPUSkin(Skeleton& skeleton, Pose& pose) {
 	mNormAttrib->Set(mSkinnedNormal);
 }
 #endif
+
+void Mesh::CPUSkin(std::vector<mat4>& animatedPose) {
+	unsigned int numVerts = (unsigned int)mPosition.size();
+	if (numVerts == 0) return;
+
+	mSkinnedPosition.resize(numVerts);
+	mSkinnedNormal.resize(numVerts);
+
+	for (unsigned int i = 0; i < numVerts; i++) { // 对每个顶点计算骨骼对其的影响
+		vec4& weights = mWeights[i];
+		ivec4& joints = mInfluences[i];
+
+		// 由于是已经计算好的矩阵，直接组合即可
+		vec3 p0 = transformPoint(animatedPose[joints.x], mPosition[i]);
+		vec3 p1 = transformPoint(animatedPose[joints.y], mPosition[i]);
+		vec3 p2 = transformPoint(animatedPose[joints.z], mPosition[i]);
+		vec3 p3 = transformPoint(animatedPose[joints.w], mPosition[i]);
+		mSkinnedPosition[i] = p0 * weights.x + p1 * weights.y + p2 * weights.z + p3 * weights.w; // 加权
+		
+		// 法线同理
+		vec3 n0 = transformVector(animatedPose[joints.x], mNormal[i]);
+		vec3 n1 = transformVector(animatedPose[joints.y], mNormal[i]);
+		vec3 n2 = transformVector(animatedPose[joints.z], mNormal[i]);
+		vec3 n3 = transformVector(animatedPose[joints.w], mNormal[i]);
+		mSkinnedNormal[i] = n0 * weights.x + n1 * weights.y + n2 * weights.z + n3 * weights.w; // 加权
+	}
+
+	mPosAttrib->Set(mSkinnedPosition);
+	mNormAttrib->Set(mSkinnedNormal);
+}

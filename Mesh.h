@@ -45,6 +45,7 @@ public:
 	std::vector<unsigned int>& GetIndices();
 
 	void CPUSkin(Skeleton& skeleton, Pose& pose);
+	void CPUSkin(std::vector<mat4>& animatedPose); // 传过来计算好的矩阵进行蒙皮 已经是pose*invBind了
 	void UpdateOpenGLBuffers();
 
 	void Bind(int position, int normal, int texcoord, int weight, int influence); // 绑定到指定的slot
