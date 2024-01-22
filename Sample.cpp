@@ -80,7 +80,11 @@ void Sample::Initialize() {
 	cgltf_data* gltf = LoadGLTFFile("Assets/GBVS_Narmaya.gltf");
 	mCPUMeshes = LoadMeshes(gltf);
 	mSkeleton = LoadSkeleton(gltf);
-	mClips = LoadAnimationClips(gltf);
+	std::vector<Clip> clips = LoadAnimationClips(gltf);
+	mClips.resize(clips.size());
+	for (unsigned int i = 0; i < (unsigned int)clips.size(); i++) {
+		mClips[i] = OptimizeClip(clips[i]);
+	}
 	FreeGLTFFile(gltf);
 
 	// 调整骨骼顺序
@@ -91,7 +95,7 @@ void Sample::Initialize() {
 	}
 	for (unsigned int i = 0; i < mClips.size(); i++) {
 		// 由于骨骼id变了，TransformTrack中的id也就变了，需要调整
-		RearrangeClip(mClips[i], bones);
+		RearrangeFastClip(mClips[i], bones);
 	}
 
 	mGPUMeshes = mCPUMeshes;

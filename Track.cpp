@@ -5,6 +5,10 @@ template Track<float, 1>;
 template Track<vec3, 3>;
 template Track<quat, 4>;
 
+template FastTrack<float, 1>;
+template FastTrack<vec3, 3>;
+template FastTrack<quat, 4>;
+
 namespace TrackHelpers {
 	inline float Interpolate(float a, float b, float t) {
 		return a + (b - a) * t;
@@ -236,4 +240,91 @@ T Track<T, N>::SampleCubic(float time, bool looping) {
 	slope2 = slope2 * frameDelta;
 
 	return Hermite(t, point1, slope1, point2, slope2);
+}
+
+template<typename T, int N>
+void FastTrack<T, N>::UpdateIndexLookupTable() {
+	// 首先保证有合法的帧
+	int numFrames = (int)this->mFrames.size();
+	if (numFrames <= 1) return;
+
+	float duration = this->GetEndTime() - this->GetStartTime();
+	unsigned int numSamples = 60 + duration * 60.f; // 一秒取60个采样点  感觉应该加个数保证duration为0带来的结果为0
+	mSampledFrames.resize(numSamples);
+
+	for (unsigned int i = 0; i < numSamples; i++) {
+		// 计算该采样点对应的时间
+		float t = (float)i / (float)(numSamples - 1);
+		float time = t * duration + this->GetStartTime();
+
+		// 找该时间点之前的最后一帧
+		unsigned int frameIndex = 0;
+		for (int j = numFrames - 1; j >= 0; j--) {
+			if (time >= this->mFrames[j].mTime) {
+				frameIndex = (unsigned int)j;
+				// 如果是该时间点之前的帧是最后一帧，令其为倒数第二帧
+				if ((int)frameIndex >= numFrames - 2) {
+					frameIndex = numFrames - 2;
+				}
+				break;
+			}
+		}
+		mSampledFrames[i] = frameIndex;
+	}
+}
+
+template<typename T, int N>
+int FastTrack<T, N>::FrameIndex(float time, bool looping) {
+	// 模板定义阶段：只对模板中和模板参数无关的名字进行查找，忽略那些有模板参数的部分。
+	// 模板实例化阶段：对模板中和模板参数有关的名字进行查找，替换模板参数为实际类型。
+	// mFrames是一个和模板参数有关的名字,其中N是模板参数。在模板定义阶段，编译器会忽略掉mFrames的存在。而在模板实例化阶段，编译器已经认定mFrames是一个非成员函数，不会去基类中查找它，所以就会报错找不到mFrames。
+	// 为了解决这个问题，需要在mFrames前面加上this->或者SeqList<T>::，这样就可以告诉编译器，mFrames是一个成员变量，需要在基类中查找。这样，编译器就会在模板实例化阶段，正确地找到mFrames的定义，而不会报错。
+	std::vector<Frame<N>>& frames = this->mFrames;
+	unsigned int size = frames.size();
+	if (size <= 1) return -1;
+
+	// 调整时间
+	if (looping) {
+		float startTime = this->GetStartTime();
+		float endTime = this->GetEndTime();
+		float duration = endTime - startTime;
+		time = fmodf(time - startTime, duration);
+		if (time < 0.0f) {
+			time += duration;
+		}
+		time += startTime;
+	}
+	else {
+		if (time <= frames[0].mTime) return 0;
+		if (time >= frames[size - 2].mTime) return (int)size - 2;
+	}
+
+	float duration = this->GetEndTime() - this->GetStartTime();
+	float t = time / duration;
+	unsigned int numSamples = 60 + (unsigned int)(duration * 60.0f);
+
+	unsigned int index = t * numSamples;
+	if (index >= mSampledFrames.size()) {
+		return -1;
+	}
+	return (int)mSampledFrames[index];
+}
+
+template FastTrack<float, 1> OptimizeTrack(Track<float, 1>& input);
+template FastTrack<vec3, 3> OptimizeTrack(Track<vec3, 3>& input);
+template FastTrack<quat, 4> OptimizeTrack(Track<quat, 4>& input);
+
+template<typename T, int N>
+FastTrack<T, N> OptimizeTrack(Track<T, N>& input) {
+	FastTrack<T, N> result;
+	
+	result.SetInterpolation(input.GetInterpolation());
+	unsigned int size = input.Size();
+	result.Resize(size);
+	for (unsigned int i = 0; i < size; i++) {
+		result[i] = input[i];
+	}
+	result.UpdateIndexLookupTable();
+
+	return result;
 }

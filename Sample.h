@@ -41,7 +41,7 @@ protected:
 
 	//Pose mRestPose;
 	//Pose mCurrentPose;
-	std::vector<Clip> mClips;
+	std::vector<FastClip> mClips;
 	//unsigned int mCurrentClip;
 	//float mPlaybackTime;
 	//DebugDraw* mRestPoseVisual;

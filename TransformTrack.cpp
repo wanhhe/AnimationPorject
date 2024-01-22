@@ -1,35 +1,46 @@
 #include "TransformTrack.h"
 
-TransformTrack::TransformTrack() {
+template TTransformTrack<VectorTrack, QuaternionTrack>;
+template TTransformTrack<FastVectorTrack, FastQuaternionTrack>;
+
+template <typename VTRACK, typename QTRACK>
+TTransformTrack<VTRACK, QTRACK>::TTransformTrack() {
 	mId = 0;
 }
 
-unsigned int TransformTrack::GetId() {
+template <typename VTRACK, typename QTRACK>
+unsigned int TTransformTrack<VTRACK, QTRACK>::GetId() {
 	return mId;
 }
 
-void TransformTrack::SetId(unsigned int id) {
+template <typename VTRACK, typename QTRACK>
+void TTransformTrack<VTRACK, QTRACK>::SetId(unsigned int id) {
 	mId = id;
 }
 
-VectorTrack& TransformTrack::GetPositionTrack() {
+template <typename VTRACK, typename QTRACK>
+VTRACK& TTransformTrack<VTRACK, QTRACK>::GetPositionTrack() {
 	return mPosition;
 }
 
-QuaternionTrack& TransformTrack::GetRotationTrack() {
+template <typename VTRACK, typename QTRACK>
+QTRACK& TTransformTrack<VTRACK, QTRACK>::GetRotationTrack() {
 	return mRotation;
 }
 
-VectorTrack& TransformTrack::GetScaleTrack() {
+template <typename VTRACK, typename QTRACK>
+VTRACK& TTransformTrack<VTRACK, QTRACK>::GetScaleTrack() {
 	return mScale;
 }
 
-bool TransformTrack::IsValid() {
+template <typename VTRACK, typename QTRACK>
+bool TTransformTrack<VTRACK, QTRACK>::IsValid() {
 	// 只要有一个合法就可以了
 	return mPosition.Size() > 1 || mRotation.Size() > 1 || mScale.Size() > 1;
 }
 
-float TransformTrack::GetStartTime() {
+template <typename VTRACK, typename QTRACK>
+float TTransformTrack<VTRACK, QTRACK>::GetStartTime() {
 	float result = 0.0f;
 	bool isSet = false; // 是否已经有合法的轨迹
 
@@ -55,7 +66,8 @@ float TransformTrack::GetStartTime() {
 	return result;
 }
 
-float TransformTrack::GetEndTime() {
+template <typename VTRACK, typename QTRACK>
+float TTransformTrack<VTRACK, QTRACK>::GetEndTime() {
 	float result = 0.0f;
 	bool isSet = false; // 是否已经有合法的轨迹
 
@@ -81,7 +93,8 @@ float TransformTrack::GetEndTime() {
 	return result;
 }
 
-Transform TransformTrack::Sample(const Transform& ref, float time, bool looping) {
+template <typename VTRACK, typename QTRACK>
+Transform TTransformTrack<VTRACK, QTRACK>::Sample(const Transform& ref, float time, bool looping) {
 	Transform result = ref; // 默认的变换
 	if (mPosition.Size() > 1) { // 合法轨迹才进行变换
 		result.position = mPosition.Sample(time, looping);
@@ -93,5 +106,16 @@ Transform TransformTrack::Sample(const Transform& ref, float time, bool looping)
 		result.scale = mScale.Sample(time, looping);
 	}
 	
+	return result;
+}
+
+FastTransformTrack OptimizeTransformTrack(TransformTrack& input) {
+	FastTransformTrack result;
+
+	result.SetId(input.GetId());
+	result.GetPositionTrack() = OptimizeTrack<vec3, 3>(input.GetPositionTrack());
+	result.GetRotationTrack() = OptimizeTrack<quat, 4>(input.GetRotationTrack());
+	result.GetScaleTrack() = OptimizeTrack<vec3, 3>(input.GetScaleTrack());
+
 	return result;
 }

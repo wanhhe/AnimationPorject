@@ -6,9 +6,10 @@
 #include <string>
 #include "Pose.h"
 
-class Clip {
+template <typename TRACK>
+class TClip {
 protected:
-	std::vector<TransformTrack> mTracks;
+	std::vector<TRACK> mTracks;
 	std::string mName;
 	float mStartTime;
 	float mEndTime;
@@ -17,13 +18,13 @@ protected:
 	float AdjustTimeToFitRange(float time);
 
 public:
-	Clip();
+	TClip();
 
 	unsigned int GetIdAtIndex(unsigned int index);
 	void SetIdAtIndex(unsigned int index, unsigned int id);
 	unsigned int Size();
 	float Sample(Pose& outPose, float time); // 对Clip采样并将结果赋给一个Pose
-	TransformTrack& operator[](unsigned int joint); // 根据骨骼id获得
+	TRACK& operator[](unsigned int joint); // 根据骨骼id获得
 	void RecalculateDuration(); // 计算Clip的时间间隔
 
 	std::string& GetName();
@@ -34,6 +35,11 @@ public:
 	bool GetLooping();
 	void SetLooping(bool looping);
 };
+
+typedef TClip<TransformTrack> Clip;
+typedef TClip<FastTransformTrack> FastClip;
+
+FastClip OptimizeClip(Clip& input);
 
 #endif // !_H_CLIP_
 

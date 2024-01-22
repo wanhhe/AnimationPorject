@@ -74,6 +74,16 @@ void RearrangeClip(Clip& clip, BoneMap& boneMap) {
 	}
 }
 
+void RearrangeFastClip(FastClip& fastClip, BoneMap& boneMap) {
+	unsigned int size = fastClip.Size();
+
+	for (unsigned int i = 0; i < size; i++) {
+		int joint = fastClip.GetIdAtIndex(i); // 获得骨骼的原id
+		unsigned int newJoint = (unsigned int)boneMap[joint];
+		fastClip.SetIdAtIndex(i, newJoint);
+	}
+}
+
 void RearrangeMesh(Mesh& mesh, BoneMap& boneMap) {
 	std::vector<ivec4>& influences = mesh.GetInfluences();
 	unsigned int size = influences.size();
