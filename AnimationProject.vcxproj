@@ -21,8 +21,11 @@
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Attribute.h" />
+    <ClInclude Include="Blending.h" />
     <ClInclude Include="cgltf.h" />
     <ClInclude Include="Clip.h" />
+    <ClInclude Include="CrossFadeController.h" />
+    <ClInclude Include="CrossFadeTarget.h" />
     <ClInclude Include="DebugDraw.h" />
     <ClInclude Include="Draw.h" />
     <ClInclude Include="Frame.h" />
@@ -51,8 +54,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Attribute.cpp" />
+    <ClCompile Include="Blending.cpp" />
     <ClCompile Include="cgltf.c" />
     <ClCompile Include="Clip.cpp" />
+    <ClCompile Include="CrossFadeController.cpp" />
     <ClCompile Include="DebugDraw.cpp" />
     <ClCompile Include="Draw.cpp" />
     <ClCompile Include="glad.c" />

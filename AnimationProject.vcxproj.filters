@@ -52,6 +52,12 @@
     <Filter Include="源文件\Rendering">
       <UniqueIdentifier>{4eaccd79-0087-4996-a57a-e44071f546c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Animation\Blending">
+      <UniqueIdentifier>{ca80b72e-709f-4de9-882f-acc24763127e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Animation\Blending">
+      <UniqueIdentifier>{340f49a9-f0ae-418e-9285-d0f9f170933f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sample.h">
@@ -141,6 +147,15 @@
     <ClInclude Include="RearrangeBones.h">
       <Filter>头文件\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="Blending.h">
+      <Filter>头文件\Animation\Blending</Filter>
+    </ClInclude>
+    <ClInclude Include="CrossFadeTarget.h">
+      <Filter>头文件\Animation\Blending</Filter>
+    </ClInclude>
+    <ClInclude Include="CrossFadeController.h">
+      <Filter>头文件\Animation\Blending</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp">
@@ -214,6 +229,12 @@
     </ClCompile>
     <ClCompile Include="RearrangeBones.cpp">
       <Filter>源文件\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Blending.cpp">
+      <Filter>源文件\Animation\Blending</Filter>
+    </ClCompile>
+    <ClCompile Include="CrossFadeController.cpp">
+      <Filter>源文件\Animation\Blending</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
